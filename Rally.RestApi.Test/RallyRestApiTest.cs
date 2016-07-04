@@ -15,8 +15,6 @@ namespace Rally.RestApi.Test
 	[TestClass]
 	public class RallyRestApiTest
 	{
-		private static string defectOid;
-
 		public static RallyRestApi GetRallyRestApi(string userName = "", string password = "",
 			string server = "", string wsapiVersion = "")
 		{
@@ -59,29 +57,9 @@ namespace Rally.RestApi.Test
 			return api;
 		}
 
-		RallyRestApi GetRallyRestApi1x()
-		{
-			return GetRallyRestApi(wsapiVersion: "1.43");
-		}
-
 		RallyRestApi GetRallyRestApi2x()
 		{
 			return GetRallyRestApi(wsapiVersion: "v2.0");
-		}
-
-		[TestMethod]
-		public void BadAuth1x()
-		{
-			try
-			{
-				RallyRestApi restApi = GetRallyRestApi(userName: "foo", wsapiVersion: "1.43");
-				restApi.GetSubscription();
-				Assert.Fail();
-			}
-			catch (Exception e)
-			{
-				Assert.AreEqual(e.Message, "The remote server returned an error: (401) Unauthorized.");
-			}
 		}
 
 		[TestMethod]
@@ -100,13 +78,6 @@ namespace Rally.RestApi.Test
 		}
 
 		[TestMethod]
-		public void CreateTest1x()
-		{
-			RallyRestApi restApi = GetRallyRestApi1x();
-			AssertCanCreate(restApi);
-		}
-
-		[TestMethod]
 		public void CreateTest2x()
 		{
 			RallyRestApi restApi = GetRallyRestApi2x();
@@ -122,14 +93,9 @@ namespace Rally.RestApi.Test
 			Assert.IsTrue(response.Reference.ToLower().Contains("defect"));
 			dynamic testDefect = restApi.GetByReference(response.Reference);
 			Assert.AreEqual(dynamicJson["Name"], testDefect.Name);
-			defectOid = Ref.GetOidFromRef(response.Reference);
-		}
 
-		[TestMethod]
-		public void CreateSadPath1x()
-		{
-			RallyRestApi restApi = GetRallyRestApi1x();
-			AssertCreateFailure(restApi);
+			// Now delete it
+			TestHelperDeleteDefect(restApi, response.Reference);
 		}
 
 		[TestMethod]
@@ -151,13 +117,6 @@ namespace Rally.RestApi.Test
 		}
 
 		[TestMethod]
-		public void Delete1x()
-		{
-			RallyRestApi restApi = GetRallyRestApi1x();
-			AssertCanDelete(restApi);
-		}
-
-		[TestMethod]
 		public void Delete2x()
 		{
 			RallyRestApi restApi = GetRallyRestApi2x();
@@ -166,26 +125,13 @@ namespace Rally.RestApi.Test
 
 		private void AssertCanDelete(RallyRestApi restApi, bool includeFullData = false)
 		{
-			var dynamicJson = new DynamicJsonObject();
-			dynamicJson["Name"] = "C# Json Rest Toolkit Test Defect";
-			if (includeFullData)
-			{
-				dynamicJson["Owner"] = restApi.GetCurrentUser()["_ref"];
-				dynamicJson["Package"] = "Package A";
-			}
-			CreateResult response = restApi.Create("defect", dynamicJson);
-			Assert.AreEqual(0, response.Errors.Count);
-			Assert.IsTrue(response.Reference.ToLower().Contains("defect"));
-			OperationResult deleteResponse = restApi.Delete(Ref.GetRelativeRef(response.Reference));
-			dynamic testDefectEmpty = restApi.GetByReference(response.Reference);
-			Assert.IsNull(testDefectEmpty);
-		}
+			// Create test defect
+			var defect = TestHelperCreateDefect(restApi, includeFullData);
+			var defectOid = Ref.GetOidFromRef(defect);
 
-		[TestMethod]
-		public void Update1x()
-		{
-			RallyRestApi restApi = GetRallyRestApi1x();
-			AssertCanUpdate(restApi);
+			OperationResult deleteResponse = restApi.Delete(Ref.GetRelativeRef(defect));
+			dynamic testDefectEmpty = restApi.GetByReference(defect);
+			Assert.IsNull(testDefectEmpty);
 		}
 
 		[TestMethod]
@@ -197,21 +143,59 @@ namespace Rally.RestApi.Test
 
 		private void AssertCanUpdate(RallyRestApi restApi)
 		{
+			// Create test defect
+			var defect = TestHelperCreateDefect(restApi);
+			var defectOid = Ref.GetOidFromRef(defect);
+
 			var dynamicJson = new DynamicJsonObject();
 			dynamicJson["Name"] = "Dont delete me please " + DateTime.Now.Second;
 			OperationResult response = restApi.Update("Defect", defectOid, dynamicJson);
 			Assert.AreEqual(0, response.Errors.Count);
 			dynamic updateDefect = restApi.GetByReference("/Defect/" + defectOid + ".js");
 			Assert.AreEqual(dynamicJson["Name"], updateDefect.Name);
+
+			// Now delete it
+			TestHelperDeleteDefect(restApi, defect);
+		}
+
+		private string TestHelperCreateDefect(RallyRestApi restApi, bool includeFullData = false)
+		{
+			var dynamicJson = new DynamicJsonObject();
+			dynamicJson["Name"] = "C# Json Rest Toolkit Test Defect";
+			if (includeFullData)
+			{
+				dynamicJson["Owner"] = restApi.GetCurrentUser()["_ref"];
+				dynamicJson["Package"] = "Package A";
+			}
+
+			CreateResult response = restApi.Create("defect", dynamicJson);
+			Assert.AreEqual(0, response.Errors.Count);
+			Assert.IsTrue(response.Reference.ToLower().Contains("defect"));
+
+			return response.Reference;
+		}
+
+		private void TestHelperDeleteDefect(RallyRestApi restApi, string reference)
+		{
+			OperationResult deleteResponse = restApi.Delete(Ref.GetRelativeRef(reference));
+			dynamic testDefectEmpty = restApi.GetByReference(reference);
+			Assert.IsNull(testDefectEmpty);
 		}
 
 		[TestMethod]
 		public void GetByReferenceTest()
 		{
 			RallyRestApi restApi = GetRallyRestApi();
-			AssertCanCreate(restApi);
+
+			// Create test defect
+			var defect = TestHelperCreateDefect(restApi);
+			var defectOid = Ref.GetOidFromRef(defect);
+
 			dynamic response = restApi.GetByReference("/Defect/" + defectOid + ".js");
 			Assert.AreEqual(defectOid, response.ObjectID.ToString());
+
+			// Now delete it
+			TestHelperDeleteDefect(restApi, defect);
 		}
 
 		[TestMethod]
@@ -223,14 +207,6 @@ namespace Rally.RestApi.Test
 			String featureRef = queryResults.Results.First()._ref;
 			DynamicJsonObject feature = restApi.GetByReference(featureRef, "Name");
 			Assert.IsNotNull(feature);
-		}
-
-		[TestMethod]
-		public void GetAllowedAttributeValuesTest1x()
-		{
-			RallyRestApi restApi = GetRallyRestApi1x();
-			QueryResult response = restApi.GetAllowedAttributeValues("hierarchicalrequirement", "schedulestate");
-			Assert.IsNotNull(response.Results.SingleOrDefault(a => a.StringValue == "Accepted"));
 		}
 
 		[TestMethod]
@@ -255,16 +231,6 @@ namespace Rally.RestApi.Test
 			RallyRestApi restApi = GetRallyRestApi();
 			dynamic response = restApi.GetByReference("/subscription.js");
 			Assert.IsNotNull(response.ObjectID);
-		}
-
-
-
-		[TestMethod]
-		public void TestAttribute1x()
-		{
-			RallyRestApi restApi125 = GetRallyRestApi1x();
-			QueryResult result125 = restApi125.GetAttributesByType("Preference");
-			VerifyAttributes(result125, false);
 		}
 
 		[TestMethod]
@@ -390,13 +356,6 @@ namespace Rally.RestApi.Test
 		{
 			var restApi = GetRallyRestApi2x();
 			Assert.IsTrue(restApi.IsWsapi2);
-		}
-
-		[TestMethod]
-		public void TestIsNotWsapi2()
-		{
-			var restApi = GetRallyRestApi1x();
-			Assert.IsFalse(restApi.IsWsapi2);
 		}
 
 		[TestMethod]
