@@ -1174,8 +1174,8 @@ namespace Rally.RestApi
 				{
 					ConnectionInfo.SecurityToken = GetSecurityToken();
 					httpService = new HttpService(authManger, ConnectionInfo);
-					Thread.Sleep(retrySleepTime * retryCounter);
-					return DoGetAsPost(request, true, retryCounter++);
+					Thread.Sleep(retrySleepTime);
+					return DoGetAsPost(request, true, ++retryCounter);
 				}
 
 				return response;
@@ -1184,8 +1184,8 @@ namespace Rally.RestApi
 			{
 				if (retryCounter < 10)
 				{
-					Thread.Sleep(retrySleepTime * retryCounter);
-					return DoGetAsPost(request, true, retryCounter++);
+					Thread.Sleep(retrySleepTime);
+					return DoGetAsPost(request, true, ++retryCounter);
 				}
 				throw;
 			}
@@ -1213,8 +1213,8 @@ namespace Rally.RestApi
 				{
 					ConnectionInfo.SecurityToken = GetSecurityToken();
 					httpService = new HttpService(authManger, ConnectionInfo);
-					Thread.Sleep(retrySleepTime * retryCounter);
-					return DoGet(uri, true, retryCounter++);
+					Thread.Sleep(retrySleepTime);
+					return DoGet(uri, true, ++retryCounter);
 				}
 
 				return response;
@@ -1223,8 +1223,8 @@ namespace Rally.RestApi
 			{
 				if (retryCounter < 10)
 				{
-					Thread.Sleep(retrySleepTime * retryCounter);
-					return DoGet(uri, true, retryCounter++);
+					Thread.Sleep(retrySleepTime);
+					return DoGet(uri, true, ++retryCounter);
 				}
 				throw;
 			}
@@ -1253,8 +1253,8 @@ namespace Rally.RestApi
 				{
 					ConnectionInfo.SecurityToken = GetSecurityToken();
 					httpService = new HttpService(authManger, ConnectionInfo);
-					Thread.Sleep(retrySleepTime * retryCounter);
-					return DoPost(uri, data, true, retryCounter++);
+					Thread.Sleep(retrySleepTime);
+					return DoPost(uri, data, true, ++retryCounter);
 				}
 
 				return response;
@@ -1263,8 +1263,8 @@ namespace Rally.RestApi
 			{
 				if (retryCounter < 10)
 				{
-					Thread.Sleep(retrySleepTime * retryCounter);
-					return DoPost(uri, data, true, retryCounter++);
+					Thread.Sleep(retrySleepTime);
+					return DoPost(uri, data, true, ++retryCounter);
 				}
 				throw;
 			}
