@@ -1,0 +1,9 @@
+{
+  "baseversion": "3.0.1.#{buildCounter}",
+  "branches": [
+    {
+      "isDefault": true,
+      "tag": "unofficial"
+    }
+  ]
+}
