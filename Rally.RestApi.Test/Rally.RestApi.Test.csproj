@@ -85,7 +85,11 @@
     <None Include="..\Rally.Development.Key.snk">
       <Link>Rally.Development.Key.snk</Link>
     </None>
+    <None Include="local.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="app.config" />
+    <None Include="local.config.template" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

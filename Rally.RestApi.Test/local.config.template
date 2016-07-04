@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Rally.RestApi.Test.Properties.Settings>
+  <setting name="UserName" serializeAs="String">
+    <value>#{rally:username}</value>
+  </setting>
+  <setting name="Password" serializeAs="String">
+    <value>#{rally:password}</value>
+  </setting>
+  <setting name="TestServer" serializeAs="String">
+    <value>https://rally1.rallydev.com</value>
+  </setting>
+  <setting name="ApiKey" serializeAs="String">
+    <value>#{rally:apikey}</value>
+  </setting>
+</Rally.RestApi.Test.Properties.Settings>
