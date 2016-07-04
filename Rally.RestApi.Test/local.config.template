@@ -12,4 +12,10 @@
   <setting name="ApiKey" serializeAs="String">
     <value>#{rally:apikey}</value>
   </setting>
+  <setting name="WorkspaceOID" serializeAs="String">
+    <value>#{rally:workspaceOID}</value>
+  </setting>
+  <setting name="ProjectOID" serializeAs="String">
+    <value>#{rally:ProjectOID}</value>
+  </setting>
 </Rally.RestApi.Test.Properties.Settings>
