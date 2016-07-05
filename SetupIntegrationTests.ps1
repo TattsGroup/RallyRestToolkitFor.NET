@@ -3,6 +3,7 @@ Param(
     [string]$file,
     [array]$values,
     [switch]$strict,
+    [switch]$prompt,
     [switch]$help
 )
 
@@ -35,6 +36,17 @@ try
 
     Write-Output "Found $($variables.Count) variables to be replaced"
     $variables |% { Write-Output "`t$_" }
+
+    if ($prompt)
+    {
+        $values = @()
+        $variables |% `
+        {
+            $name = $_.Trim('#', '{', '}')
+            $value = Read-Host -Prompt "Enter value for $_"
+            $values += "$name=$value"
+        }  
+    }
 
     Write-Output "`nProcessing arguments"
     $values |% `
