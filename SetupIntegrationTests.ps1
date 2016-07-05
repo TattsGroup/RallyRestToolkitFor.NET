@@ -1,28 +1,28 @@
 [CmdletBinding()]
 Param(
-    [string]$file,
-    [array]$values,
-    [switch]$strict,
-    [switch]$prompt,
-    [switch]$help
+    [string]$File,
+    [parameter(Mandatory=$true,ValueFromRemainingArguments=$true)][array]$Values,
+    [switch]$Strict,
+    [switch]$NoPrompt,
+    [switch]$Help
 )
 
 $ErrorActionPreference = "Stop"
 
 try
 {
-    if ($help)
+    if ($Help)
     {
         Write-Output ''
-        Write-Output 'USAGE: .\SetupIntegrationTests.ps1 -File "filename" -Values "param1=value1", "param2=value2" [-Strict]'
+        Write-Output 'USAGE: .\SetupIntegrationTests.ps1 -File "filename" -Values "param1=value1", "param2=value2" [-Strict] [-NoPrompt]'
         Exit 0
     }
 
     $arguments = @()
 
-    Write-Output "`nProcessing target file $file"
+    Write-Output "`nProcessing target file $File"
 
-    $content = Get-Content -Raw -Path $file
+    $content = Get-Content -Raw -Path $File
 
     $regex = [regex] '(?<variable>#{\S+})'
     $allmatches = $regex.Matches($content);
@@ -37,24 +37,13 @@ try
     Write-Output "Found $($variables.Count) variables to be replaced"
     $variables |% { Write-Output "`t$_" }
 
-    if ($prompt)
-    {
-        $values = @()
-        $variables |% `
-        {
-            $name = $_.Trim('#', '{', '}')
-            $value = Read-Host -Prompt "Enter value for $_"
-            $values += "$name=$value"
-        }  
-    }
-
     Write-Output "`nProcessing arguments"
-    $values |% `
+    $Values |% `
     {
         # Get last line and split to SHA and filename
         $split = @( $_ -Split '=', 2 )
 
-        # Create summary item
+        # Create argument object
         $argument = [PSCustomObject] `
         @{
             Name = $split[0]
@@ -75,6 +64,20 @@ try
         $paramName = $_.Trim('#', '{', '}')
 
         $argument = $arguments |? { $_.Name -eq $paramName }
+        if ($argument -eq $null -and !$NoPrompt)
+        {
+            $value = Read-Host -Prompt "Enter value for $_"
+        
+            # Create argument object
+            $argument = [PSCustomObject] `
+            @{
+                Name = $paramName
+                Value = $value
+            }
+
+            $arguments += $argument
+        }
+
         if ($argument -ne $null)
         {
             $content = $content -replace $_, $argument.Value
@@ -83,7 +86,7 @@ try
         else
         {
             $msg = "No value was specified for config variable '$_'"
-            if ($strict)
+            if ($Strict)
             {
                 throw $msg
             }
@@ -94,8 +97,8 @@ try
         }
     }
 
-    Write-Output "`nWriting updated content to $file"
-    $content | Set-Content -Encoding UTF8 -Path $file -Force
+    Write-Output "`nWriting updated content to $File"
+    $content | Set-Content -Encoding UTF8 -Path $File -Force
     
     Write-Output "`nAll Done!"
 
