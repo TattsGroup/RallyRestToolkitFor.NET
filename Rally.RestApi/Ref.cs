@@ -13,21 +13,21 @@ namespace Rally.RestApi
 		#region Regexes
 		private static List<Regex> regexes = new List<Regex>() {
 
-            //dynatype collection ref (/portfolioitem/feature/1234/children)
-            new Regex (".*/(\\w{2,}/\\w+)/(\\d+/\\w+)(?:\\.js)*(?:\\?.*)*$"),
-            
-            //dynatype ref (/portfolioitem/feature/1234)
-            new Regex (".*/(\\w{2,}/\\w+)/(\\d+)(?:\\.js)*(?:\\?.*)*$"),
+			//dynatype collection ref (/portfolioitem/feature/1234/children)
+			new Regex (".*/(\\w{2,}/\\w+)/(\\d+/\\w+)(?:\\.js)*(?:\\?.*)*$"),
+			
+			//dynatype ref (/portfolioitem/feature/1234)
+			new Regex (".*/(\\w{2,}/\\w+)/(\\d+)(?:\\.js)*(?:\\?.*)*$"),
 
-            //collection ref (/defect/1234/tasks)
-            new Regex (".*/(\\w+/-?\\d+)/(\\w+)(?:\\.js)*(?:\\?.*)*$"),
+			//collection ref (/defect/1234/tasks)
+			new Regex (".*/(\\w+/-?\\d+)/(\\w+)(?:\\.js)*(?:\\?.*)*$"),
 
-            //basic ref (/defect/1234)
-            new Regex (".*/(\\w+)/(-?\\d+)(?:\\.js)*(?:\\?.*)*$"),
+			//basic ref (/defect/1234)
+			new Regex (".*/(\\w+)/(-?\\d+)(?:\\.js)*(?:\\?.*)*$"),
 
-            //permission ref (/workspacepermission/123u456w1)
-            new Regex (".*/(\\w+)/(\\d+u\\d+[pw]\\d+)(?:\\.js)*(?:\\?.*)*$"),
-        };
+			//permission ref (/workspacepermission/123u456w1)
+			new Regex (".*/(\\w+)/(\\d+u\\d+[pw]\\d+)(?:\\.js)*(?:\\?.*)*$"),
+		};
 		#endregion
 
 		#region IsRef
@@ -39,11 +39,11 @@ namespace Rally.RestApi
 		/// <example>
 		/// <code language="C#">
 		/// bool isValid;
-		/// isValid = Ref.IsRef("http://rally1.rallydev.com/slm/webservice/1.32/defect/1234.js");
+		/// isValid = Ref.IsRef("http://rally1.rallydev.com/slm/webservice/v2.0/defect/1234");
 		/// // isValid is true
 		/// 
 		/// 
-		/// isValid = Ref.IsRef("https://rally1.rallydev.com/slm/webservice/1.32/defect/abc.js");
+		/// isValid = Ref.IsRef("https://rally1.rallydev.com/slm/webservice/v2.0/defect/abc");
 		/// // isValid is false
 		/// </code>
 		/// </example>

@@ -433,7 +433,7 @@ namespace Rally.RestApi.Web
 
 			ConnectionInfo ssoConnection = new ConnectionInfo();
 			ssoConnection.AuthType = AuthorizationType.Basic;
-			ssoConnection.Server = new Uri(String.Format("{0}login/key.js", connectionInfo.Server.AbsoluteUri));
+			ssoConnection.Server = new Uri(String.Format("{0}login/key", connectionInfo.Server.AbsoluteUri));
 			ssoConnection.Port = connectionInfo.Port;
 			ssoConnection.Proxy = connectionInfo.Proxy;
 			ssoConnection.UserName = connectionInfo.UserName;

@@ -638,7 +638,7 @@ namespace Rally.RestApi
 		/// </example>
 		public dynamic GetCurrentUser(params string[] fetchedFields)
 		{
-			return GetByReference("/user.js", fetchedFields);
+			return GetByReference("/user", fetchedFields);
 		}
 		#endregion
 
@@ -662,7 +662,7 @@ namespace Rally.RestApi
 			if (ConnectionInfo == null)
 				throw new InvalidOperationException(AUTH_ERROR);
 
-			return GetByReference("/subscription.js", fetchedFields);
+			return GetByReference("/subscription", fetchedFields);
 		}
 		#endregion
 
@@ -701,7 +701,7 @@ namespace Rally.RestApi
 		/// <exception cref="ArgumentNullException">Occurs if the passed in aRef parameter is null.</exception>
 		/// <example>
 		/// <code language="C#">
-		/// string aRef = "https://preview.rallydev.com/slm/webservice/v2.0/defect/12345.js"
+		/// string aRef = "https://preview.rallydev.com/slm/webservice/v2.0/defect/12345"
 		/// DynamicJsonObject item = restApi.GetByReference(aRef, "Name", "FormattedID");
 		/// string itemName = item["Name"];
 		/// </code>
@@ -717,11 +717,6 @@ namespace Rally.RestApi
 			if (fetchedFields.Length == 0)
 			{
 				fetchedFields = new string[] { "true" };
-			}
-
-			if (!aRef.Contains(".js"))
-			{
-				aRef = aRef + ".js";
 			}
 
 			DynamicJsonObject wrappedReponse = DoGet(GetFullyQualifiedUri(aRef + "?fetch=" + string.Join(",", fetchedFields)));
@@ -741,7 +736,7 @@ namespace Rally.RestApi
 		/// <exception cref="RallyFailedToDeserializeJson">The JSON returned by Rally was not able to be deserialized. Please check the JsonData property for what was returned by Rally.</exception>
 		/// <example>
 		/// <code language="C#">
-		/// string aRef = "https://preview.rallydev.com/slm/webservice/v2.0/defect/12345.js"
+		/// string aRef = "https://preview.rallydev.com/slm/webservice/v2.0/defect/12345"
 		/// string workspaceRef = "/workspace/12345678910";
 		/// DynamicJsonObject item = restApi.GetByReference(aRef, workspaceRef, "Name", "FormattedID");
 		/// string itemName = item["Name"];
@@ -755,11 +750,6 @@ namespace Rally.RestApi
 			if (fetchedFields.Length == 0)
 			{
 				fetchedFields = new string[] { "true" };
-			}
-
-			if (!aRef.Contains(".js"))
-			{
-				aRef = aRef + ".js";
 			}
 
 			string workspaceClause = "";
@@ -851,10 +841,6 @@ namespace Rally.RestApi
 				throw new InvalidOperationException(AUTH_ERROR);
 
 			var result = new OperationResult();
-			if (!aRef.Contains(".js"))
-			{
-				aRef = aRef + ".js";
-			}
 			String workspaceClause = workspaceRef == null ? "" : "?workspace=" + workspaceRef;
 			dynamic response = DoDelete(GetFullyQualifiedUri(aRef + workspaceClause));
 			result.Errors.AddRange(DecodeArrayList(response.OperationResult.Errors));
@@ -934,7 +920,7 @@ namespace Rally.RestApi
 		/// <exception cref="RallyFailedToDeserializeJson">The JSON returned by Rally was not able to be deserialized. Please check the JsonData property for what was returned by Rally.</exception>
 		/// <example>
 		/// <code language="C#">
-		/// string rallyRef = "https://preview.rallydev.com/slm/webservice/1.40/defect/12345.js";
+		/// string rallyRef = "https://preview.rallydev.com/slm/webservice/v2.0/defect/12345";
 		/// DynamicJsonObject toUpdate = new DynamicJsonObject(); 
 		/// toUpdate["Description"] = "This is my defect."; 
 		/// OperationResult updateResult = restApi.Update(rallyRef, toUpdate);
@@ -1130,7 +1116,7 @@ namespace Rally.RestApi
 		internal Uri FormatCreateUri(string workspaceRef, string typePath)
 		{
 			String workspaceClause = workspaceRef == null ? "" : "?workspace=" + workspaceRef;
-			return new Uri(httpService.Server.AbsoluteUri + "slm/webservice/" + WsapiVersion + "/" + typePath + "/create.js" + workspaceClause);
+			return new Uri(httpService.Server.AbsoluteUri + "slm/webservice/" + WsapiVersion + "/" + typePath + "/create" + (IsWsapi2 ? "" : ".js") + workspaceClause);
 		}
 		#endregion
 
@@ -1138,8 +1124,7 @@ namespace Rally.RestApi
 		internal Uri FormatUpdateUri(string typePath, string objectId)
 		{
 			return
-					new Uri(httpService.Server.AbsoluteUri + "slm/webservice/" + WsapiVersion + "/" + typePath + "/" + objectId +
-									".js");
+					new Uri(httpService.Server.AbsoluteUri + "slm/webservice/" + WsapiVersion + "/" + typePath + "/" + objectId + (IsWsapi2 ? "" : ".js"));
 		}
 		#endregion
 
@@ -1170,7 +1155,7 @@ namespace Rally.RestApi
 																							 | SecurityProtocolType.Tls12;
 				ServicePointManager.Expect100Continue = true;
 				Dictionary<string, string> data = request.GetDataToSend();
-				Uri uri = GetFullyQualifiedUri(request.ShortRequestUrl);
+				Uri uri = GetFullyQualifiedUri(request.Endpoint);
 				Dictionary<string, string> processedHeaders = GetProcessedHeaders();
 				DynamicJsonObject response = serializer.Deserialize(httpService.GetAsPost(GetSecuredUri(uri), data, processedHeaders));
 
@@ -1372,6 +1357,18 @@ namespace Rally.RestApi
 		/// <returns>The fully qualified ref</returns>
 		private string GetFullyQualifiedRef(string aRef)
 		{
+			if (!IsWsapi2 && !aRef.Contains(".js"))
+			{
+				if (aRef.Contains("?"))
+				{
+					aRef = aRef.Replace("?", ".js?");
+				}
+				else
+				{
+					aRef = aRef + ".js";
+				}
+			}
+
 			if (!aRef.StartsWith(WebServiceUrl))
 				return String.Format("{0}{1}", WebServiceUrl, aRef);
 			else

@@ -36,7 +36,7 @@ namespace Rally.RestApi
 		/// <example>
 		/// <code>
 		/// DynamicJsonObject collection = new DynamicJsonObject();
-		/// collection["_ref"] = "/hierarchicalrequirement/12345/defect.js";
+		/// collection["_ref"] = "/hierarchicalrequirement/12345/defect";
 		/// Request request = new Request(collection);
 		/// </code>
 		/// </example>
@@ -193,27 +193,25 @@ namespace Rally.RestApi
 			}
 		}
 
-		internal virtual string ShortRequestUrl { get { return String.Format("{0}{1}", Endpoint, ".js"); ; } }
-
 		internal virtual string RequestUrl { get { return BuildQueryString(); } }
 
 		#endregion
 
-        #region AddParameter
-	    /// <summary>
-	    /// Ability to add parameters other than the ones explicitly exposed.
-	    /// </summary>
-	    /// <param name="key"></param>
-	    /// <param name="value"></param>
-	    /// <returns>true if added. false if the key already existed</returns>
-	    public bool AddParameter(string key, string value)
-	    {
-	        if (GetParameterValue(key, null) != null)
-	            return false;
-	        Parameters[key] = value;
-	        return true;
-	    }
-	    #endregion
+		#region AddParameter
+		/// <summary>
+		/// Ability to add parameters other than the ones explicitly exposed.
+		/// </summary>
+		/// <param name="key"></param>
+		/// <param name="value"></param>
+		/// <returns>true if added. false if the key already existed</returns>
+		public bool AddParameter(string key, string value)
+		{
+			if (GetParameterValue(key, null) != null)
+				return false;
+			Parameters[key] = value;
+			return true;
+		}
+		#endregion
 
 		#region Helper: GetParameterValue
 		private dynamic GetParameterValue(string keyValue, object defaultValue = null)
@@ -328,7 +326,7 @@ namespace Rally.RestApi
 		private string BuildQueryString()
 		{
 			StringBuilder sb = new StringBuilder();
-			sb.Append(ShortRequestUrl);
+			sb.Append(Endpoint);
 
 			Dictionary<string, string> data = GetDataToSend(true);
 			bool isFirst = true;
@@ -356,7 +354,7 @@ namespace Rally.RestApi
 		/// <returns>A request object that represents the reference string.</returns>
 		/// <example>
 		/// <code>
-		/// string url = "https://rally1.rallydev.com/slm/webservice/v2.0/hierarchicalrequirement/12345/defect.js?pagesize=172&amp;fetch=Name&amp;order=ObjectID&amp;start=57";
+		/// string url = "https://rally1.rallydev.com/slm/webservice/v2.0/hierarchicalrequirement/12345/defect?pagesize=172&amp;fetch=Name&amp;order=ObjectID&amp;start=57";
 		/// Request request = Request.CreateFromUrl(url);
 		/// </code>
 		/// </example>

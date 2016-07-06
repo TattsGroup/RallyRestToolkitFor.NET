@@ -151,7 +151,7 @@ namespace Rally.RestApi.Test
 			dynamicJson["Name"] = "Dont delete me please " + DateTime.Now.Second;
 			OperationResult response = restApi.Update("Defect", defectOid, dynamicJson);
 			Assert.AreEqual(0, response.Errors.Count);
-			dynamic updateDefect = restApi.GetByReference("/Defect/" + defectOid + ".js");
+			dynamic updateDefect = restApi.GetByReference("/Defect/" + defectOid);
 			Assert.AreEqual(dynamicJson["Name"], updateDefect.Name);
 
 			// Now delete it
@@ -191,7 +191,7 @@ namespace Rally.RestApi.Test
 			var defect = TestHelperCreateDefect(restApi);
 			var defectOid = Ref.GetOidFromRef(defect);
 
-			dynamic response = restApi.GetByReference("/Defect/" + defectOid + ".js");
+			dynamic response = restApi.GetByReference("/Defect/" + defectOid);
 			Assert.AreEqual(defectOid, response.ObjectID.ToString());
 
 			// Now delete it
@@ -221,7 +221,7 @@ namespace Rally.RestApi.Test
 		public void GetByReferenceUserTest()
 		{
 			RallyRestApi restApi = GetRallyRestApi();
-			dynamic response = restApi.GetByReference("/user.js");
+			dynamic response = restApi.GetByReference("/user");
 			Assert.IsNotNull(response.ObjectID);
 		}
 
@@ -229,7 +229,7 @@ namespace Rally.RestApi.Test
 		public void GetByReferenceSubscriptionTest()
 		{
 			RallyRestApi restApi = GetRallyRestApi();
-			dynamic response = restApi.GetByReference("/subscription.js");
+			dynamic response = restApi.GetByReference("/subscription");
 			Assert.IsNotNull(response.ObjectID);
 		}
 
@@ -246,7 +246,7 @@ namespace Rally.RestApi.Test
 		{
 			RallyRestApi restApi = GetRallyRestApi();
 			Uri result = restApi.FormatCreateUri(null, "defect");
-			var expected = new Uri(Settings.Default.TestServer + "/slm/webservice/" + RallyRestApi.DEFAULT_WSAPI_VERSION + "/defect/create.js");
+			var expected = new Uri(Settings.Default.TestServer + "/slm/webservice/" + RallyRestApi.DEFAULT_WSAPI_VERSION + "/defect/create");
 			Assert.AreEqual(expected, result);
 		}
 
@@ -255,7 +255,7 @@ namespace Rally.RestApi.Test
 		{
 			RallyRestApi restApi = GetRallyRestApi();
 			Uri result = restApi.FormatUpdateUri("defect", "2121901027");
-			var expected = new Uri(Settings.Default.TestServer + "/slm/webservice/" + RallyRestApi.DEFAULT_WSAPI_VERSION + "/defect/2121901027.js");
+			var expected = new Uri(Settings.Default.TestServer + "/slm/webservice/" + RallyRestApi.DEFAULT_WSAPI_VERSION + "/defect/2121901027");
 			Assert.AreEqual(expected, result);
 		}
 

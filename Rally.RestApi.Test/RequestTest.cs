@@ -31,7 +31,7 @@ namespace Rally.RestApi.Test
 		public void CloneCollection()
 		{
 			DynamicJsonObject collection = new DynamicJsonObject();
-			collection["_ref"] = "/hierarchicalrequirement/12345/defect.js";
+			collection["_ref"] = "/hierarchicalrequirement/12345/defect";
 			var request = new Request(collection);
 			request.Fetch = new List<string>() { "Name", "FormattedID" };
 
@@ -109,9 +109,9 @@ namespace Rally.RestApi.Test
 		[TestMethod]
 		public void TestCreateFromRef()
 		{
-			TestCreateFromRefHelper("https://rally1.rallydev.com/slm/webservice/v2.0/defect.js?pagesize=1&fetch=true&order=Name+desc,ObjectID&start=1",
+			TestCreateFromRefHelper("https://rally1.rallydev.com/slm/webservice/v2.0/defect?pagesize=1&fetch=true&order=Name+desc,ObjectID&start=1",
 					"https://rally1.rallydev.com/slm/webservice/v2.0");
-			TestCreateFromRefHelper("https://rally1.rallydev.com/slm/webservice/v2.0/hierarchicalrequirement/12345/defect.js?pagesize=172&fetch=Name&order=ObjectID&start=57",
+			TestCreateFromRefHelper("https://rally1.rallydev.com/slm/webservice/v2.0/hierarchicalrequirement/12345/defect?pagesize=172&fetch=Name&order=ObjectID&start=57",
 					"https://rally1.rallydev.com/slm/webservice/v2.0");
 			TestCreateFromRefHelper("https://rally1.rallydev.com/slm/webservice/v2.0/Project/3195568271/Editors",
 					"https://rally1.rallydev.com/slm/webservice/v2.0");
@@ -131,22 +131,22 @@ namespace Rally.RestApi.Test
 		}
 
 
-	    [TestMethod]
-	    public void TestAddParameter()
-	    {
-	        var request = new Request();
-	        var count = request.Parameters.Count;
-	        var result = request.AddParameter("something", "somethingValue");
-	        Assert.IsTrue(result);
-	        Assert.AreEqual(count + 1, request.Parameters.Count);
-            Assert.IsTrue(request.Parameters.ContainsKey("something"));
-            Assert.AreEqual("somethingValue", request.Parameters["something"]);
+		[TestMethod]
+		public void TestAddParameter()
+		{
+			var request = new Request();
+			var count = request.Parameters.Count;
+			var result = request.AddParameter("something", "somethingValue");
+			Assert.IsTrue(result);
+			Assert.AreEqual(count + 1, request.Parameters.Count);
+			Assert.IsTrue(request.Parameters.ContainsKey("something"));
+			Assert.AreEqual("somethingValue", request.Parameters["something"]);
 
-            //doesn't overwrite
-            result = request.AddParameter("something", "somethingElse");
-            Assert.IsFalse(result);
-            Assert.AreNotEqual("somethingElse", request.Parameters["something"]);
-            Assert.AreEqual("somethingValue", request.Parameters["something"]);
-	    }
+			//doesn't overwrite
+			result = request.AddParameter("something", "somethingElse");
+			Assert.IsFalse(result);
+			Assert.AreNotEqual("somethingElse", request.Parameters["something"]);
+			Assert.AreEqual("somethingValue", request.Parameters["something"]);
+		}
 	}
 }
