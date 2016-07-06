@@ -38,7 +38,7 @@ namespace Rally.RestApi.Test
 				wsapiVersion = RallyRestApi.DEFAULT_WSAPI_VERSION;
 			}
 
-			RallyRestApi api = new RallyRestApi(webServiceVersion: wsapiVersion);
+			RallyRestApi api = new RallyRestApi(webServiceVersion: wsapiVersion, traceInfo: (TraceFieldEnum)Settings.Default.Trace);
 			api.Authenticate(userName, password, server);
 			return api;
 		}
@@ -51,7 +51,7 @@ namespace Rally.RestApi.Test
 				apiKey = Settings.Default.ApiKey;
 			}
 
-			RallyRestApi api = new RallyRestApi(webServiceVersion: wsapiVersion);
+			RallyRestApi api = new RallyRestApi(webServiceVersion: wsapiVersion, traceInfo: (TraceFieldEnum)Settings.Default.Trace);
 			RallyRestApi.AuthenticationResult authResult = api.AuthenticateWithApiKey(apiKey, server);
 			Assert.AreEqual(RallyRestApi.AuthenticationResult.Authenticated, authResult);
 			return api;

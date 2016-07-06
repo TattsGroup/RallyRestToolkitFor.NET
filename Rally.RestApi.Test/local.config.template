@@ -18,4 +18,7 @@
   <setting name="ProjectOID" serializeAs="String">
     <value>#{rally:ProjectOID}</value>
   </setting>
+  <setting name="Trace" serializeAs="String">
+    <value>#{rally:trace}</value>
+  </setting>
 </Rally.RestApi.Test.Properties.Settings>

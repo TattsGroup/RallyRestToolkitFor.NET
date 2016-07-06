@@ -74,5 +74,14 @@ namespace Rally.RestApi.Test.Properties {
                 return ((long)(this["ProjectOID"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("7")]
+        public int Trace {
+            get {
+                return ((int)(this["Trace"]));
+            }
+        }
     }
 }
